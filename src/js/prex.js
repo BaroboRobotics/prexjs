@@ -3,6 +3,7 @@
 var Promise = require( 'promise' );
 var ProtoBuf = require( 'protobufjs' );
 var WebSocketClient = require( 'websocket' ).w3cwebsocket;
+var ByteBuffer = require( 'bytebuffer' );
 
 var Proxy = function() {
     var self = this;
@@ -73,6 +74,22 @@ var Proxy = function() {
 
     self.off = function(name) {
         // TODO
+    };
+
+    // Send a string to the remote process's stdin
+    self.sendIo = function( to_stdin ) {
+        return new Promise( function( resolve, reject ) {
+            var ioMessage = new _pb_root.Io({
+                'type': _pb_root.Io.FD.STDIN,
+                'data': ByteBuffer.wrap(to_stdin)
+            });
+            var prexMessage = new _pb_root.PrexMessage( {
+                'type': _pb_root.PrexMessage.MessageType.IO,
+                'payload': ioMessage.encode()
+            });
+            self._socket.send(prexMessage.toBuffer());
+            resolve();
+        });
     };
 
     self._handleIoMessage = function( message ) {
