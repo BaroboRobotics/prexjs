@@ -30,7 +30,7 @@ var Proxy = function() {
                 var prexMessage = _pb_root.PrexMessage.decode( message.data );
                 if( prexMessage.type == _pb_root.PrexMessage.MessageType.IO ) {
                     self._handleIoMessage(prexMessage.payload);
-                } else if ( prexMessage.type == prexMessage.MessageType.IMAGE) {
+                } else if ( prexMessage.type == _pb_root.PrexMessage.MessageType.IMAGE) {
                     self._handleImageMessage(prexMessage.payload);
                 } else {
                     // We shouldn't be receiving any other type of message...
