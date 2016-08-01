@@ -56,7 +56,7 @@ var Proxy = function() {
     };
 
     self._callbacks = {};
-    var names = ['io', 'image', 'connect', 'connectionTerminated'];
+    var names = ['io', 'image', 'connect', 'connectionTerminated', 'stdin'];
     for( var i = 0; i < names.length; i++ ) {
         self._callbacks[names[i]] = [];
     }
@@ -94,8 +94,15 @@ var Proxy = function() {
 
     self._handleIoMessage = function( message ) {
         var ioMessage = _pb_root.Io.decode( message );
-        for( var i = 0; i < self._callbacks.io.length; i++ ) {
-            self._callbacks.io[i](ioMessage);
+        if (ioMessage.type == _pb_root.Io.FD.STDOUT) {
+            for( var i = 0; i < self._callbacks.io.length; i++ ) {
+                self._callbacks.io[i](ioMessage);
+            }
+        }
+        if (ioMessage.type == _pb_root.Io.FD.STDIN) {
+            for( var j = 0; j < self._callbacks.io.length; j++ ) {
+                self._callbacks.stdin[j](ioMessage.data.toString('utf8'));
+            }
         }
     };
 
